@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public  class practical19 {
+public  class practical18 {
 
 
     public static void main(String[] args) {
