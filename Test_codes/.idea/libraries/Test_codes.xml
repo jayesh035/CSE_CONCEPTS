@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Test_codes">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/First.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Driver.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
