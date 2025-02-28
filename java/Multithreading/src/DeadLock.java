@@ -1,61 +1,67 @@
-public class DeadLock {
-
-
-    boolean setLock=true;
-    boolean getLock=true;
-    void set() throws InterruptedException {
-
-        while(setLock!=true)
-        {
-            System.out.println(Thread.currentThread().getName()+" is waiting to set");
-        }
-        setLock=false;
-//        Thread.yield();
-        get();
-        setLock=true;
+class Pen {
+    public synchronized void writeWithPenAndPaper(Paper paper) {
+        System.out.println(Thread.currentThread().getName() + " is using pen " + this + " and trying to use paper " + paper);
+        paper.finishWriting();
     }
 
-    void get() throws InterruptedException {
-
-        while (getLock!=true)
-        {
-            System.out.println(Thread.currentThread().getName()+" is waiting to get");
-        }
-//        Thread.yield();
-        Thread.sleep(1);
-        getLock=false;
-        set();
-        getLock=true;
-
+    public synchronized void finishWriting() {
+        System.out.println(Thread.currentThread().getName() + " finished using pen " + this);
     }
+}
+
+class Paper {
+    public synchronized void writeWithPaperAndPen(Pen pen) {
+        System.out.println(Thread.currentThread().getName() + " is using paper " + this + " and trying to use pen " + pen);
+        pen.finishWriting();
+    }
+
+    public synchronized void finishWriting() {
+        System.out.println(Thread.currentThread().getName() + " finished using paper " + this);
+    }
+}
+
+class Task1 implements Runnable {
+    private Pen pen;
+    private Paper paper;
+
+    public Task1(Pen pen, Paper paper) {
+        this.pen = pen;
+        this.paper = paper;
+    }
+
+    @Override
+    public void run() {
+        pen.writeWithPenAndPaper(paper); // thread1 locks pen and tries to lock paper
+    }
+}
+
+class Task2 implements Runnable {
+    private Pen pen;
+    private Paper paper;
+
+    public Task2(Pen pen, Paper paper) {
+        this.pen = pen;
+        this.paper = paper;
+    }
+
+    @Override
+    public void run() {
+        synchronized (pen){
+            paper.writeWithPaperAndPen(pen); // thread2 locks paper and tries to lock pen
+        }
+    }
+}
+
+
+ class DeadlockExample {
     public static void main(String[] args) {
+        Pen pen = new Pen();
+        Paper paper = new Paper();
 
-        DeadLock d1=new DeadLock();
-        Thread t1=new Thread(() -> {
-            try {
-                d1.get();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        Thread thread1 = new Thread(new Task1(pen, paper), "Thread-1");
+        Thread thread2 = new Thread(new Task2(pen, paper), "Thread-2");
 
-
-
-
-        Thread t2=new Thread(() -> {
-            try {
-                d1.set();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-
-        t1.start();
-        t2.start();
-
-
-
-
+        thread1.start();
+        thread2.start();
     }
 }
