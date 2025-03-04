@@ -1,4 +1,6 @@
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class FutureMethods {
 
@@ -32,4 +34,9 @@ public class FutureMethods {
         service.shutdown();
 
     }
+
+
+    Lock l1=new ReentrantLock();
+
+
 }
