@@ -118,12 +118,22 @@ public class Tmp {
        }
        else if(nodes.size()==2)
        {
-           if(map.contains(Arrays.asList(nodes.get(0),nodes.get(1)))
-           || map.contains(Arrays.asList(nodes.get(1),nodes.get(0))))
+//           map.
+
+           for(int i=1;i<=n;i++)
            {
-               return false;
+               if(i!=nodes.get(0) && i!=nodes.get(1))
+               {
+                   if(!map.contains(Arrays.asList(i,nodes.get(0)))
+                   && !map.contains(Arrays.asList(i,nodes.get(1)))
+                   && !map.contains(Arrays.asList(nodes.get(0),i))
+                   && !map.contains(Arrays.asList(nodes.get(1),i)))
+                   {
+                       return true;
+                   }
+               }
            }
-           return  true;
+           return false;
        }
        else
        {
