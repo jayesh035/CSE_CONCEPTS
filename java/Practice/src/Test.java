@@ -62,36 +62,96 @@ public class Test {
     int findBits(int target)
     {
         int count=0;
-        for(int i=0;i<31;i++)
+        int mul=1;
+
+        while(mul<target)
         {
-            if((target&(1<<i))!=0)
-            {
-                count++;
-            }
+            mul*=2;
+            count++;
         }
 
         return count;
     }
+    class PairX{
 
+        int first;
+        int second;
+        int third;
+
+        public PairX(int first, int second, int third) {
+            this.first = first;
+            this.second = second;
+            this.third = third;
+        }
+    }
+
+    class  Pair{
+        int first,second;
+
+        public Pair(int first, int second) {
+            this.first = first;
+            this.second = second;
+        }
+    }
     public int racecar(int target) {
 
 
-        int numBits=findBits(target)+1;
+      HashSet<String>vis=new HashSet<>();
 
-        int nextPos=(int)Math.pow(2,numBits)-1;
-        if(nextPos == target)
-        {
-            return numBits;
-        }
+      Queue<Pair>q=new ArrayDeque<>();
+      HashMap<Pair,Integer>dp=new HashMap<>();
+
+      vis.add(0+"/"+1);
+      q.add(new Pair(0,1));
+int ans=0;
+      while(!q.isEmpty())
+      {
+//         PairX p= q.poll();
+//         dp.put(new Pair(p.first,p.second),p.third)
 
 
-        int acsed=numBits+1+findBits(nextPos-target);
+          int n=q.size();
+
+
+          for(int i=0;i<n;i++)
+          {
+
+
+              Pair front=q.poll();
+              String accelarate=(front.first+ front.second)+"/"+(2* front.second);
+              String reverse=(front.first)+"/"+( front.second>0?-1:1);
+              if(front.first==target)
+              {
+                  return ans;
+              }
+              if((front.first+ front.second-target)<target && !vis.contains(accelarate))
+              {
+                  q.add(new Pair(front.first+ front.second,2* front.second));
+                  vis.add(accelarate);
+              }
+              if((front.first-target)<target && !vis.contains(reverse))
+              {
+                  q.add(new Pair(front.first,front.second>0?-1:1));
+                  vis.add(reverse);
+              }
+
+
+          }
+          ans++;
 
 
 
 
 
-        return 0;
+
+      }
+
+
+      return  -1;
+
+
+
+
 
 
 
