@@ -11,8 +11,11 @@ public class Server {
             ServerSocket server = new ServerSocket(port);
             System.out.println("✅ Server is running on port: " + port);
 
-            while (true) {  // Keep server running to accept multiple clients
+//            while (true) {  // Keep server running to accept multiple clients
                 Socket client = server.accept();
+                client.setKeepAlive(true);
+                client.setSendBufferSize((8*1024));
+//                client.setSoTimeout(500);
                 System.out.println("🎉 Client connected!");
 
                 // Create input and output streams
@@ -27,7 +30,7 @@ public class Server {
 
                 System.out.println("🚫 Client disconnected.");
                 client.close(); // Close client connection
-            }
+//            }
 
         } catch (Exception e) {
             System.out.println("❌ Error in server: " + e);

@@ -34,7 +34,7 @@ public class ChatServer {
     public static void main(String[] args) {
         int port = 8081;
         ExecutorService acceptorService = Executors.newSingleThreadExecutor();
-        ExecutorService pollerService = Executors.newFixedThreadPool(3);
+        ExecutorService pollerService = Executors.newSingleThreadExecutor();
 
         // Create the server socket outside of try-with-resources
         ServerSocket serverSocket = null;
@@ -190,11 +190,11 @@ public class ChatServer {
 //import java.net.*;
 //import java.util.concurrent.*;
 //
-//class ChatApplication.ChatServer {
+//class ChatServer {
 //    static ServerSocket server;
 //    static ConcurrentHashMap<Integer, Socket> clients = new ConcurrentHashMap<>();
 //    static BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();  // Central queue as DB
-//    static ExecutorService clientPool = Executors.newFixedThreadPool(2);  // Handles multiple clients
+//    static ExecutorService clientPool = Executors.newFixedThreadPool(1);  // Handles multiple clients
 //
 //    public static void main(String[] args) {
 //        int port = 8081;
@@ -208,6 +208,7 @@ public class ChatServer {
 //
 //            while (true) {
 //                Socket client = server.accept();
+//                client.setSoTimeout(2);
 //                int clientId = client.hashCode();
 //                clients.put(clientId, client);
 //                System.out.println("🟢 Client " + clientId + " connected.");
@@ -239,17 +240,22 @@ public class ChatServer {
 //            writer.println("✅ Connected! Your ID is: " + clientId);
 //            writer.println("📢 Type '@clientID message' to send a private message.");
 //
-//            String message;
+//            String message= reader.readLine();
 //            long time=System.currentTimeMillis();
-//            while ((message = reader.readLine()) != null) {
-//                if(System.currentTimeMillis()-time > 200)
-//                {
-//                    break;
-//                }
+////            while ((message = reader.readLine()) != null) {
+////                if(System.currentTimeMillis()-time > 200)
+////                {
+////                    break;
+////                }
 //                System.out.println("📩 Received from " + clientId + ": " + message);
 //                processMessage(clientId, message);
-//            }
-//        } catch (IOException e) {
+////            }
+//        }
+//        catch (SocketTimeoutException e)
+//        {
+//
+//        }
+//        catch (IOException e) {
 //            System.out.println("⚠ Client " + clientId + " disconnected.");
 //        } finally {
 //            ChatApplication.ChatServer.clients.remove(clientId);
