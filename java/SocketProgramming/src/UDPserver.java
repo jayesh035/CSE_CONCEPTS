@@ -17,7 +17,8 @@ public class UDPserver {
 
            while (true) {
                 // Step 2: Create a packet to receive data
-                DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+                DatagramPacket receivePacket =
+                        new DatagramPacket(receiveBuffer, receiveBuffer.length);
 
                 // Step 3: Wait for incoming data (blocks until received)
                 serverSocket.receive(receivePacket);
