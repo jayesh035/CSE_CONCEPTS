@@ -37,8 +37,10 @@ public class ParkingLot {
                 String ticketId = "T-" + spot.getId() + "-" + System.currentTimeMillis();
                 Ticket ticket = new Ticket(ticketId, vehicle, spot);
                 activeTickets.put(spot.getId(), ticket);
-                return "Vehicle " + vehicle.getLicenseNumber() + " parked at spot " + spot.getId() +
-                        ". Ticket issued: " + ticket.toString();
+                return "Vehicle " + vehicle.getLicenseNumber()
+                        + "\nparked at spot " + spot.getId() +
+                        "\nlevel:"+level+
+                        "\nTicket issued: " + ticket.toString();
             }
         }
         return "No available spot for vehicle type " + vehicle.getType();
@@ -58,8 +60,8 @@ public class ParkingLot {
                         activeTickets.remove(spotId);
                         spot.releaseSpot();
                         spot.setAvailable(true);
-                        return "Spot " + spotId + " released. " +
-                                "Vehicle " + ticket.getVehicle().getLicenseNumber() +
+                        return "Spot " + spotId +"at level "+level+ " released.\n" +
+                                "Vehicle:" + ticket.getVehicle().getLicenseNumber() +
                                 " was parked for " + duration.toMinutes() + " minutes.";
                     } else {
                         // Fallback if no ticket is found (should not normally happen)
@@ -94,11 +96,12 @@ public class ParkingLot {
                 for (ParkingSpot spot : spots.values()) {
                     sb.append(spot.getId())
                             .append(" - ")
-                            .append(spot.isAvailable() ? "Available" : "Occupied");
+                            .append(spot.isAvailable() ? "Available - " : "Occupied - ");
                     // If occupied, display the vehicle's license number.
                     if (!spot.isAvailable() && spot.getVehicle() != null) {
                         sb.append(" (").append(spot.getVehicle().getLicenseNumber()).append(")");
                     }
+                    sb.append(spot.getVehicle().getType());
                     sb.append("\n");
                 }
             }

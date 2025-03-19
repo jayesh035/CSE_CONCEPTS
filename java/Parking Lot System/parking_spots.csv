@@ -2,7 +2,7 @@ Spot ID,Status,VehicleLicenseNumber,VehicleType,Level
 S4,true,,BIKE,1
 S8,true,,TRUCK,1
 S80,true,,TRUCK,1
-S60,false,jhfgfh,CAR,1
+S60,true,,CAR,1
 S40,true,,BIKE,1
 S84,true,,TRUCK,1
 S20,true,,BIKE,1
