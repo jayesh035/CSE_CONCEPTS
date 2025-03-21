@@ -1,3 +1,5 @@
+package Util;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
@@ -10,7 +12,7 @@ public class ParkingSpotsCSVGenerator {
 
         try (FileWriter writer = new FileWriter(fileName)) {
             // Write CSV Header
-            writer.append("Spot ID,Status,VehicleLicenseNumber,VehicleType,Level\n");
+            writer.append("Spot ID,Status,VehicleLicenseNumber,VehicleType,Server.Classes.Level\n");
 
             // Corrected Array Initialization
             String[] vehicles = {"BIKE", "CAR", "TRUCK"}; // Each vehicle is a separate element
