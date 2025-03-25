@@ -1,18 +1,22 @@
 package Server.Classes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ParkingLot {
 
-    private static final Logger logger = LoggerFactory.getLogger(ParkingLot.class);
+
 
     // Store active tickets
     // to store data of parking spot and vehicle at particular time
     private final ConcurrentHashMap<String, Ticket> activeTickets;
+
+    //to vehicle type wise store parking slots data
+    private final HashMap<String, List<ParkingSpot> >typeSlots;
 
     //Spots to retrieve spots based on spotNumber and levelNumber
     private final ConcurrentHashMap<String, ParkingSpot> Spots;
@@ -27,6 +31,8 @@ public class ParkingLot {
     {
         // Initialize active tickets and spots
         Spots = new ConcurrentHashMap<>();
+
+        typeSlots=new HashMap<>();
 
         activeTickets = new ConcurrentHashMap<>();
 
@@ -50,11 +56,22 @@ public class ParkingLot {
         for (int i = 1; i <= 15; i++)
         {
 
-            Vehicle vehicle = new Vehicle(null, vehicleTypes[random.nextInt(3)]);
+
+            String vehicleType=vehicleTypes[random.nextInt(3)];
+            Vehicle vehicle = new Vehicle(null, vehicleType);
 
             String spotID = i + "SL" + levelNumber;
 
             ParkingSpot spot = new ParkingSpot(spotID, vehicle, true);
+
+            if(!typeSlots.containsKey(vehicleType))
+            {
+                typeSlots.put(vehicleType,new ArrayList<>());
+            }
+
+            typeSlots.get(vehicleType).add(spot);
+
+
 
             Spots.put(spotID, spot);
 
@@ -217,32 +234,44 @@ public class ParkingLot {
 
 
         StringBuilder sb = new StringBuilder();
-        for(int i=1;i<=4;i++)
+
+
+        if(typeSlots.containsKey(vehicleType))
         {
-            sb.append("\nLevel:").append(i);
-            for(int j=1;j<=15;j++)
+            List<ParkingSpot>spots=typeSlots.get(vehicleType);
+            for(ParkingSpot spot:spots)
             {
-                String spotID=j+"SL"+i;
-                ParkingSpot spot = Spots.get(spotID);
+
+                String spotID=spot.getId();
+
                 Vehicle vehicle = spot.getVehicle();
 
-                if (vehicle.getType().equalsIgnoreCase(vehicleType)) {
-                    sb.append("\nSpotID: ").append(spotID);
-                    sb.append(", SpotName: ").append(getSpotNumber(spotID));
-                    sb.append(", Level: ").append(getLevel(spotID));
 
-                    if (!spot.isAvailable()) {
+                sb.append("\nSpotID: ").append(spotID);
+                sb.append(", SpotName: ").append(getSpotNumber(spotID));
+                sb.append(", Level: ").append(getLevel(spotID));
+
+                if (!spot.isAvailable())
+                {
                         sb.append(", Occupied");
                         sb.append(", LicenseNumber: ").append(vehicle.getLicenseNumber());
-                    } else {
+                }
+                else
+                {
                         sb.append(", Available");
-                    }
+                }
 
                     sb.append(" VehicleType: ").append(vehicle.getType());
                     sb.append("\n\n");
-                }
+
+
             }
         }
+
+
+
+
+
 
 
 //        for (String spotID : Spots.keySet()) {
