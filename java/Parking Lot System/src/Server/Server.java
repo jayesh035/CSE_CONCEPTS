@@ -22,7 +22,7 @@ public class Server
     public static void main(String[] args)
     {
         //this allows server to handle multiple client
-        var executor = Executors.newCachedThreadPool();
+        var executor = Executors.newFixedThreadPool(8);
 
         try (ServerSocket serverSocket = new ServerSocket(PORT))
         {
