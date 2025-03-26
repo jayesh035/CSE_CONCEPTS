@@ -35,6 +35,11 @@ public class wuserver {
 
 
                 publisher.send(update, 0);
+                publisher.sendMore("10001 ");
+
+//                publisher.recv(0);
+
+                publisher.send("hiiii",0);
             }
 
         }

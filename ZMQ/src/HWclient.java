@@ -12,23 +12,20 @@ public class HWclient
     {
 
 
-        for(int i=0;i<Integer.MAX_VALUE;i++)
-        {
-
-            System.out.println(i);
-
-            new Thread(()->{
 
 
-                try (ZContext context = new ZContext()) {
+
+                try (ZContext context = new ZContext())
+                {
                     System.out.println("Connecting to hello world server");
 
                     //  Socket to talk to server
                     ZMQ.Socket socket = context.createSocket(SocketType.REQ);
                     socket.connect("tcp://localhost:5555");
 
+
 //                    for (int requestNbr = 0; requestNbr != 10; requestNbr++) {
-                        String request = "Hello";
+                        String request = "Hello"+System.currentTimeMillis();
                         System.out.println("Sending Hello by client:" + Thread.currentThread().getName());
                         long time=System.currentTimeMillis();
                         socket.send(request.getBytes(ZMQ.CHARSET), 0);
@@ -40,12 +37,13 @@ public class HWclient
                                        "client:"+ Thread.currentThread().getName()+" time:"+(System.currentTimeMillis()-time)
                         );
 
-//                    }
-                }
-
-            }).start();
-        }
+                    }
 
 
     }
+
+
+
+
+
 }

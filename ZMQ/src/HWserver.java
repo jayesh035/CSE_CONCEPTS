@@ -18,20 +18,20 @@ public class HWserver {
             ZMQ.Socket socket = context.createSocket(SocketType.REP);
             socket.bind("tcp://*:5555");
 
-            while (!Thread.currentThread().isInterrupted()) {
+//            while (!Thread.currentThread().isInterrupted()) {
                 byte[] reply = socket.recv(0);
                 System.out.println(
                         "Received " + ": [" + new String(reply, ZMQ.CHARSET) + "]"
                 );
                 String response = "world";
                 try {
-                    Thread.sleep(1000); //  Do some 'work'
+                    Thread.sleep(5000); //  Do some 'work'
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
                 socket.send(response.getBytes(ZMQ.CHARSET), 0);
 
-            }
+//            }
         }
     }
 }

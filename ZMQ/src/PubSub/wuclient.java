@@ -24,16 +24,22 @@ public class wuclient {
             //  Process 100 updates
             int update_nbr;
             long total_temp = 0;
-            for (update_nbr = 0; update_nbr < 100; update_nbr++) {
+            for (update_nbr = 0; update_nbr < 2; update_nbr++) {
                 //  Use trim to remove the tailing '0' character
                 String string = subscriber.recvStr(0).trim();
+                String title=subscriber.recvStr(0).trim();
+                String msg=subscriber.recvStr(0).trim();
+                System.out.println(string);
+                System.out.println(title);
+                System.out.println(msg);
+                System.out.println();
 
-                StringTokenizer sscanf = new StringTokenizer(string, " ");
-                int zipcode = Integer.valueOf(sscanf.nextToken());
-                int temperature = Integer.valueOf(sscanf.nextToken());
-                int relhumidity = Integer.valueOf(sscanf.nextToken());
-
-                total_temp += temperature;
+//                StringTokenizer sscanf = new StringTokenizer(string, " ");
+//                int zipcode = Integer.valueOf(sscanf.nextToken());
+//                int temperature = Integer.valueOf(sscanf.nextToken());
+//                int relhumidity = Integer.valueOf(sscanf.nextToken());
+//
+//                total_temp += temperature;
             }
 
             System.out.println(
@@ -69,10 +75,10 @@ public class wuclient {
 
 
        t1.start();
-       t2.start();
-       t3.start();
-       t4.start();
-       t5.start();
+//       t2.start();
+//       t3.start();
+//       t4.start();
+//       t5.start();
 
     }
 }
