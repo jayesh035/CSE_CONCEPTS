@@ -1,31 +1,22 @@
 package Server.Classes;
+import Util.Constants;
 
-public class ParkingSpot {
-
-
+public class ParkingSpot
+{
     //To uniquely identify each parking spot
     private final String id;
 
     //Set parking spot for specific vehicle
-    private Vehicle vehicle;
+    private final Vehicle vehicle;
 
     //For checking spot is available of not
     private boolean isAvailable;
 
     public ParkingSpot(String id, Vehicle vehicle, boolean isAvailable)
     {
-
         this.id = id;
 
         this.vehicle = vehicle;
-
-        this.isAvailable = isAvailable;
-
-    }
-
-    public ParkingSpot(String id, boolean isAvailable)
-    {
-        this.id = id;
 
         this.isAvailable = isAvailable;
     }
@@ -45,11 +36,6 @@ public class ParkingSpot {
         return isAvailable;
     }
 
-    public void setVehicle(Vehicle vehicle)
-    {
-        this.vehicle = vehicle;
-    }
-
     public void setAvailable(boolean available)
     {
         isAvailable = available;
@@ -57,35 +43,27 @@ public class ParkingSpot {
 
     void assignVehicle(String license)
     {
+        //set license number for this particular vehicle
         this.vehicle.setLicenseNumber(license);
     }
 
     void releaseSpot()
     {
-
-        // Ensure vehicle is not null before setting to null
         if (this.vehicle != null)
         {
-
-            this.vehicle = null;
-
+            this.vehicle.setLicenseNumber(Constants.emptyFlag); // Just reset the license
         }
-
-        // Mark spot as available
         this.isAvailable = true;
-
     }
+
 
     @Override
     public String toString()
     {
-
         return "ParkingSpot{" +
                 "id='" + id + '\'' +
                 ", vehicle=" + vehicle +
                 ", isAvailable=" + isAvailable +
                 '}';
-
     }
-
 }

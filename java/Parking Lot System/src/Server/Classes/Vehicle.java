@@ -3,22 +3,17 @@ package Server.Classes;
 
 public class Vehicle
 {
-
-    // TODO: Justification!
-
     //license number for uniquely identify each vehicle
     private String licenseNumber;
 
     //Type of vehicle
-    private String type;
+    private final String type;
 
     public Vehicle(String licenseNumber, String type)
     {
-
         this.licenseNumber = licenseNumber;
 
         this.type = type;
-
     }
 
     public String getLicenseNumber()

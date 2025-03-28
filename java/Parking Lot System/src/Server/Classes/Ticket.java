@@ -3,16 +3,15 @@ import java.time.LocalDateTime;
 
 public class Ticket
 {
+    private final String id;
 
-    private String id;
-
-    private LocalDateTime entryTime;
+    private final LocalDateTime entryTime;
 
     private LocalDateTime exitTime;
 
-    private Vehicle vehicle;
+    private final Vehicle vehicle;
 
-    private ParkingSpot parkingSpot;
+    private final ParkingSpot parkingSpot;
 
     // Ticket created with current entry time.
     public Ticket(String id, Vehicle vehicle, ParkingSpot parkingSpot)
@@ -40,11 +39,6 @@ public class Ticket
 
     }
 
-    public String getId()
-    {
-        return id;
-    }
-
     public LocalDateTime getEntryTime()
     {
         return entryTime;
@@ -58,11 +52,6 @@ public class Ticket
     public Vehicle getVehicle()
     {
         return vehicle;
-    }
-
-    public ParkingSpot getParkingSpot()
-    {
-        return parkingSpot;
     }
 
     @Override
