@@ -96,4 +96,10 @@ public class CRUD {
         }
 
     }
+
+
+   static void selectData()
+    {
+
+    }
 }
