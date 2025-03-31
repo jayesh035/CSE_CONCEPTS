@@ -1,4 +1,4 @@
-package Server.Classes;
+package Server.Schema;
 
 
 public class Vehicle

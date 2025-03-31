@@ -1,4 +1,4 @@
-Spot ID,Status,VehicleLicenseNumber,VehicleType,Server.Classes.Level
+Spot ID,Status,VehicleLicenseNumber,VehicleType,Server.Schema.Level
 S4,true,,CAR,1
 S8,false,fgdfg,BIKE,1
 S80,true,,BIKE,1

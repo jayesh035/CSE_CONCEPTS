@@ -1,4 +1,7 @@
-package Server.Classes;
+package Server;
+import Server.Schema.ParkingSpot;
+import Server.Schema.Ticket;
+import Server.Schema.Vehicle;
 import Util.Constants;
 import java.time.Duration;
 import java.util.ArrayList;

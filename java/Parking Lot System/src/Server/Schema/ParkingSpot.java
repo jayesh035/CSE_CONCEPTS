@@ -1,4 +1,4 @@
-package Server.Classes;
+package Server.Schema;
 import Util.Constants;
 
 public class ParkingSpot
@@ -41,13 +41,13 @@ public class ParkingSpot
         isAvailable = available;
     }
 
-    void assignVehicle(String license)
+   public void assignVehicle(String license)
     {
         //set license number for this particular vehicle
         this.vehicle.setLicenseNumber(license);
     }
 
-    void releaseSpot()
+    public void releaseSpot()
     {
         if (this.vehicle != null)
         {

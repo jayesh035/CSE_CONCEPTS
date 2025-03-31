@@ -1,4 +1,4 @@
-package Server.Classes;
+package Server.Schema;
 import java.time.LocalDateTime;
 
 public class Ticket

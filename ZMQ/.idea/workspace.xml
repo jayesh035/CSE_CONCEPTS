@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4f23a78e-a523-464d-95a1-d39d8863a5ff" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Classes/ParkingLot.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Classes/ParkingLot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Server.java" afterDir="false" />
-    </list>
+    <list default="true" id="4f23a78e-a523-464d-95a1-d39d8863a5ff" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -65,7 +62,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/jayesh/Desktop/motadata/java/Parking Lot System",
+    "last_opened_file_path": "/home/jayesh/Desktop/motadata",
     "project.structure.last.edited": "Libraries",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.0",

@@ -1,13 +1,13 @@
 package Util;
 
-public interface Constants
+public class Constants
 {
     //defined flag for empty data
-    String emptyFlag="**%%";
+  public static final  String emptyFlag="**%%";
 
     //server ip
-    String SERVER_ADDRESS = "127.0.0.1";
+  public static final  String SERVER_ADDRESS = "127.0.0.1";
 
     //server port
-    int SERVER_PORT = 8080;
+  public static final  int SERVER_PORT = 8080;
 }

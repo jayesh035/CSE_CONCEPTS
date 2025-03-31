@@ -1,5 +1,4 @@
 package Server;
-import Server.Classes.ParkingLot;
 import Util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
