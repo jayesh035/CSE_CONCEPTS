@@ -48,10 +48,18 @@ public class ParkingLot {
 
         for (int i = 1; i <= 15; i++)
         {
+            //getting vehicle type randomly for initialization
             String vehicleType=vehicleTypes[random.nextInt(3)];
 
+            //creating vehicle
             Vehicle vehicle = new Vehicle(Constants.emptyFlag, vehicleType);
 
+
+            /*
+            creating spot ID such that it can contain spotNumber and levelNumber
+            by separating with 'SL' so that we can use it as key of activeTickets
+            and spots hashmaps.
+            */
             String spotID = i + "SL" + levelNumber;
 
             ParkingSpot spot = new ParkingSpot(spotID, vehicle, true);
@@ -98,9 +106,7 @@ public class ParkingLot {
 
                                  //generate new ticket
                             return new Ticket(ticketId, spot.getVehicle(), spot);
-
                         });
-
 
                      //check if ticket is generated for same vehicle by license number or
                      if((ticket!=null) &&
@@ -122,8 +128,7 @@ public class ParkingLot {
                     }
                 }
 
-
-        return "No available spot for vehicle type " + type;
+            return "No available spot for vehicle type " + type;
     }
 
 
@@ -264,10 +269,12 @@ public class ParkingLot {
 
     public String getStatus(String vehicleType)
     {
-        StringBuilder sb = new StringBuilder();
+        //For response
+        StringBuilder response = new StringBuilder();
 
         if(typeSlots.containsKey(vehicleType))
         {
+            //get parking spots by its type
             List<ParkingSpot>spots=typeSlots.get(vehicleType);
 
             for(ParkingSpot spot:spots)
@@ -276,28 +283,28 @@ public class ParkingLot {
 
                 Vehicle vehicle = spot.getVehicle();
 
-                sb.append("\nSpotID: ").append(spotID);
+                response.append("\nSpotID: ").append(spotID);
 
-                sb.append(", SpotName: ").append(getSpotNumber(spotID));
+                response.append(", SpotName: ").append(getSpotNumber(spotID));
 
-                sb.append(", Level: ").append(getLevel(spotID));
+                response.append(", Level: ").append(getLevel(spotID));
 
                 if (!spot.isAvailable())
                 {
-                    sb.append(", Occupied");
-                    sb.append(", LicenseNumber: ").append(vehicle.getLicenseNumber());
+                    response.append(", Occupied");
+                    response.append(", LicenseNumber: ").append(vehicle.getLicenseNumber());
                 }
                 else
                 {
-                    sb.append(", Available");
+                    response.append(", Available");
                 }
 
-                sb.append(" VehicleType: ").append(vehicle.getType());
+                response.append(" VehicleType: ").append(vehicle.getType());
 
-                sb.append("\n\n");
+                response.append("\n\n");
             }
         }
 
-        return sb.isEmpty()?"Slots are not available for "+vehicleType: sb.toString();
+        return response.isEmpty()?"Slots are not available for "+vehicleType: response.toString();
     }
 }

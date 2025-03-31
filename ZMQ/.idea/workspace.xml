@@ -5,16 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4f23a78e-a523-464d-95a1-d39d8863a5ff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/PubSub/PUB.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/PubSub/SUB1.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/PubSub/SUB2.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/PubSub/SUB3.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Classes/ParkingLot.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Classes/ParkingLot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Classes/ParkingSpot.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Classes/ParkingSpot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Classes/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Classes/Vehicle.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/Parking Lot System/src/Server/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/Parking Lot System/src/Test/TestingClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/../java/Parking Lot System/src/Test/TestingClient.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

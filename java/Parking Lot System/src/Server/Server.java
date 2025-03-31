@@ -17,6 +17,7 @@ public class Server
 
     public static void main(String[] args) {
 
+        //initialize executor service with same threads
         var executor = Executors.newFixedThreadPool(8);
 
         try (ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT))
