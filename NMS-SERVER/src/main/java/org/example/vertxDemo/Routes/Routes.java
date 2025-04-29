@@ -1,0 +1,40 @@
+package org.example.vertxDemo.Routes;
+
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.JWTAuthHandler;
+import org.example.vertxDemo.Handlers.AuthHandler;
+import org.example.vertxDemo.Handlers.CredentialsHandler;
+import org.example.vertxDemo.Handlers.DiscoveryHandler;
+
+public class Routes {
+    public static void setupAuthRoutes(Router router, AuthHandler authHandler)
+    {
+        router.post("/login").handler(authHandler::handleLogin);
+        router.post("/register").handler(authHandler::handleRegister);
+    }
+
+
+    public static void setupCredentialRoutes(Router router, CredentialsHandler credentialsHandler, JWTAuthHandler jwtAuthHandler) {
+        // Public endpoint for creating credentials (no JWT required, adjust based on requirements)
+        router.post("/credentials").handler(credentialsHandler::handleCreate);
+
+        // Secured endpoints (require JWT)
+        router.get("/credentials/:id").handler(jwtAuthHandler).handler(credentialsHandler::handleRead);
+        router.get("/credentials").handler(jwtAuthHandler).handler(credentialsHandler::handleList);
+        router.put("/credentials/:id").handler(jwtAuthHandler).handler(credentialsHandler::handleUpdate);
+        router.delete("/credentials/:id").handler(jwtAuthHandler).handler(credentialsHandler::handleDelete);
+    }
+
+
+    public static void setupDiscoveryRoutes(Router router, DiscoveryHandler discoveryHandler, JWTAuthHandler jwtAuthHandler) {
+        router.post("/discoveries").handler(jwtAuthHandler).handler(discoveryHandler::handleCreate);
+        router.get("/discoveries").handler(jwtAuthHandler).handler(discoveryHandler::handleList);
+        router.get("/discoveries/:id").handler(jwtAuthHandler).handler(discoveryHandler::handleRead);
+        router.put("/discoveries/:id").handler(jwtAuthHandler).handler(discoveryHandler::handleUpdate);
+        router.delete("/discoveries/:id").handler(jwtAuthHandler).handler(discoveryHandler::handleDelete);
+
+        // Route to run a discovery task manually
+        router.post("/discoveries/:id/run").handler(jwtAuthHandler).handler(discoveryHandler::handleRunDiscovery);
+    }
+
+}

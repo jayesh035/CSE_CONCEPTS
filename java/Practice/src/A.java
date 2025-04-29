@@ -23,13 +23,13 @@ public class  A {
     {
         if(i==j)
         {
-            SGT.add(arr[i]);
+            SGT.set(indx,arr[i]);
             return;
         }
         int mid=(i+j)/2;
         build(2*indx+1,i,mid,SGT,arr);
         build(2*indx+2,mid+1,j,SGT,arr);
-        SGT.add(Math.max(SGT.get(2*indx+1),SGT.get(2*indx+2)));
+        SGT.set(indx,Math.max(SGT.get(2*indx+1),SGT.get(2*indx+2)));
     }
 
 }

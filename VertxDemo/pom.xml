@@ -12,20 +12,34 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vertx.version>4.5.4</vertx.version> <!-- ✅ ADDED -->
+        <vertx.version>4.5.4</vertx.version>
     </properties>
 
     <dependencies>
+        <!-- Vert.x core -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
             <version>${vertx.version}</version>
         </dependency>
+
+        <!-- Vert.x web (includes SockJS, Router, BodyHandler, etc.) -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
             <version>${vertx.version}</version>
         </dependency>
-    </dependencies>
 
+        <!-- Vert.x Hazelcast Cluster Manager (optional) -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-hazelcast</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-pg-client</artifactId>
+            <version>4.5.1</version>
+        </dependency>
+    </dependencies>
 </project>

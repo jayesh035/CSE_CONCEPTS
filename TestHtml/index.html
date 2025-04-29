@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vert.x Body Handler Demo</title>
+</head>
+<body>
+  <h1>Vert.x Web Request Body Types Demo</h1>
+
+  <!-- JSON Request -->
+  <h2>JSON</h2>
+  <button onclick="sendJson()">Send JSON</button>
+
+  <!-- Form Request -->
+  <h2>Form Data</h2>
+  <form id="form" onsubmit="sendForm(event)">
+    <input name="username" placeholder="Username" required>
+    <input name="password" placeholder="Password" type="password" required>
+    <button type="submit">Send Form</button>
+  </form>
+
+  <!-- File Upload -->
+  <h2>File Upload</h2>
+  <form id="fileForm" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="button" onclick="sendFile()">Upload File</button>
+  </form>
+
+  <!-- Raw Text -->
+  <h2>Raw Text</h2>
+  <textarea id="rawText" rows="4" cols="40">Hello, this is raw text!</textarea><br>
+  <button onclick="sendRawText()">Send Raw Text</button>
+
+  <h2>Response:</h2>
+  <pre id="output"></pre>
+
+  <script>
+    const output = document.getElementById("output");
+
+    function sendJson() {
+      fetch("http://localhost:8888/json", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Alice", age: 30 })
+      })
+      .then(res => res.text())
+      .then(text => output.innerText = text);
+    }
+
+    function sendForm(event) {
+      event.preventDefault();
+      const formData = new FormData(document.getElementById("form"));
+      fetch("http://localhost:8888/form", {
+        method: "POST",
+        body: new URLSearchParams(formData)
+      })
+      .then(res => res.text())
+      .then(text => output.innerText = text);
+    }
+
+    function sendFile() {
+      const fileForm = document.getElementById("fileForm");
+      const formData = new FormData(fileForm);
+      fetch("http://localhost:8888/upload", {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.text())
+      .then(text => output.innerText = text);
+    }
+
+    function sendRawText() {
+      const raw = document.getElementById("rawText").value;
+      fetch("http://localhost:8888/text", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: raw
+      })
+      .then(res => res.text())
+      .then(text => output.innerText = text);
+    }
+  </script>
+</body>
+</html>
