@@ -9,7 +9,8 @@ public class JwtUtils
 {
     private static final JWTAuth jwtAuth;
 
-    static {
+    static
+    {
         // Set up JWT Auth options using a keystore (you can also use HMAC, RSA, etc.)
         KeyStoreOptions keyStoreOptions = new KeyStoreOptions()
                 .setType("jceks")

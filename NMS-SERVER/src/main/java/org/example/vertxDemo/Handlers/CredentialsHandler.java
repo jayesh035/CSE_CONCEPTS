@@ -6,6 +6,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 import org.example.vertxDemo.Database.DatabaseClient;
+import org.example.vertxDemo.Utils.DBQueries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,8 @@ public class CredentialsHandler
         switch (systemType.toUpperCase())
         {
             case "SNMP_V1":
-            case "SNMP_V2":
+            case "SNMP_V2C":
+
                 if (!data.containsKey("community") || data.getString("community").isEmpty())
                 {
                     context.response()
@@ -50,7 +52,9 @@ public class CredentialsHandler
                     return;
                 }
                 break;
+
             case "SNMP_V3":
+
                 if (!data.containsKey("username") || data.getString("username").isEmpty() ||
                         !data.containsKey("password") || data.getString("password").isEmpty() ||
                         !data.containsKey("security_level") || data.getString("security_level").isEmpty() ||
@@ -62,6 +66,7 @@ public class CredentialsHandler
                     return;
                 }
                 break;
+
             default:
                 context.response()
                         .setStatusCode(400)
@@ -69,7 +74,7 @@ public class CredentialsHandler
                 return;
         }
 
-        String insertQuery = "INSERT INTO credentials (credential_name, systemtype, data) VALUES ($1, $2, $3::jsonb) RETURNING id";
+        String insertQuery = DBQueries.createCredentials;
 
         DatabaseClient.getPool()
                 .preparedQuery(insertQuery)
@@ -103,14 +108,16 @@ public class CredentialsHandler
     public void handleRead(RoutingContext context)
     {
         String id = context.pathParam("id");
-        if (id == null || !id.matches("\\d+")) {
+
+        if (id == null || !id.matches("\\d+"))
+        {
             context.response()
                     .setStatusCode(400)
                     .end(new JsonObject().put("error", "Valid ID is required").encode());
             return;
         }
 
-        String selectQuery = "SELECT id, credential_name, systemtype, data FROM credentials WHERE id = $1";
+        String selectQuery = DBQueries.selectCredentialById;
         DatabaseClient.getPool()
                 .preparedQuery(selectQuery)
                 .execute(Tuple.of(Long.parseLong(id)), ar ->
@@ -141,7 +148,7 @@ public class CredentialsHandler
     // List all credentials (admin-only)
     public void handleList(RoutingContext context)
     {
-        String selectQuery = "SELECT id, credential_name, systemtype, data FROM credentials";
+        String selectQuery = DBQueries.selectAllCredentials;
         DatabaseClient.getPool()
                 .preparedQuery(selectQuery)
                 .execute(ar ->
@@ -149,13 +156,15 @@ public class CredentialsHandler
                     if (ar.succeeded())
                     {
                         JsonArray credentials = new JsonArray();
-                        for (Row row : ar.result()) {
+                        for (Row row : ar.result())
+                        {
                             credentials.add(new JsonObject()
                                     .put("id", row.getLong("id"))
                                     .put("credential_name", row.getString("credential_name"))
                                     .put("systemtype", row.getString("systemtype"))
                                     .put("data", new JsonObject(row.getString("data"))));
                         }
+
                         context.response()
                                 .setStatusCode(200)
                                 .putHeader("Content-Type", "application/json")
@@ -176,6 +185,7 @@ public class CredentialsHandler
     public void handleUpdate(RoutingContext context)
     {
         String id = context.pathParam("id");
+
         if (id == null || !id.matches("\\d+"))
         {
             context.response()
@@ -185,6 +195,7 @@ public class CredentialsHandler
         }
 
         JsonObject body = context.body().asJsonObject();
+
         if (body == null)
         {
             context.response()
@@ -197,7 +208,7 @@ public class CredentialsHandler
         String systemType = body.getString("systemtype");
         JsonObject data = body.getJsonObject("data");
 
-        String updateQuery = "UPDATE credentials SET credential_name = COALESCE($1, credential_name), systemtype = COALESCE($2, systemtype), data = COALESCE($3::jsonb, data) WHERE id = $4";
+        String updateQuery = DBQueries.updateCredential;
         DatabaseClient.getPool()
                 .preparedQuery(updateQuery)
                 .execute(Tuple.of(credentialName, systemType, data != null ? data.encode() : null, Long.parseLong(id)), ar ->
@@ -231,7 +242,7 @@ public class CredentialsHandler
             return;
         }
 
-        String deleteQuery = "DELETE FROM credentials WHERE id = $1";
+        String deleteQuery = DBQueries.deleteCredentialById;
         DatabaseClient.getPool()
                 .preparedQuery(deleteQuery)
                 .execute(Tuple.of(Long.parseLong(id)), ar ->

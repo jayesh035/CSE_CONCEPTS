@@ -1,6 +1,8 @@
 package org.example.vertxDemo;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -10,19 +12,22 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.handler.JWTAuthHandler;
 import org.example.vertxDemo.Handlers.CredentialsHandler;
 import org.example.vertxDemo.Handlers.DiscoveryHandler;
+import org.example.vertxDemo.Handlers.ProvisioningHandler;
 import org.example.vertxDemo.Routes.Routes;
 import org.example.vertxDemo.Database.DatabaseClient;
 import org.example.vertxDemo.Handlers.AuthHandler;
 import org.example.vertxDemo.Utils.Constants;
+import org.example.vertxDemo.Utils.NetworkChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Main extends AbstractVerticle {
-
+public class Main extends AbstractVerticle
+{
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     @Override
-    public void start() {
+    public void start(Promise<Void> startPromise)
+    {
         // Initialize Database
         DatabaseClient.initialize(vertx);
 
@@ -39,7 +44,29 @@ public class Main extends AbstractVerticle {
         CredentialsHandler credentialsHandler = new CredentialsHandler(jwtAuth);
 
         //create DiscoveryHandler instance
-        DiscoveryHandler discoveryHandler = new DiscoveryHandler(jwtAuth);
+        DiscoveryHandler discoveryHandler = new DiscoveryHandler(jwtAuth,vertx);
+
+        // Create ProvisioningHandler instance
+        ProvisioningHandler provisioningHandler = new ProvisioningHandler(jwtAuth, vertx);
+
+
+        DeploymentOptions workerOpts = new DeploymentOptions()
+                .setWorker(true)
+                .setInstances(8);
+
+        vertx.deployVerticle(NetworkChecker.class.getName(), workerOpts, res -> {
+
+            if (res.succeeded())
+            {
+                logger.info("NetworkChecker Worker verticle deployed: {}", res.result());
+                startPromise.complete();
+            }
+            else
+            {
+                logger.info("NetworkChecker to deploy worker verticle: {}", String.valueOf(res.cause()));
+                startPromise.fail(res.cause());
+            }
+        });
 
         // Create Router
         Router router = Router.router(vertx);
@@ -57,19 +84,23 @@ public class Main extends AbstractVerticle {
         //Route for Discovery module
         Routes.setupDiscoveryRoutes(router, discoveryHandler, JWTAuthHandler.create(jwtAuth));
 
+        // Route for Provisioning module
+        Routes.setupProvisioningRoutes(router, provisioningHandler, JWTAuthHandler.create(jwtAuth));
 
         // Start the HTTP server
         vertx.createHttpServer()
                 .requestHandler(router)
                 .listen(Constants.SERVER_PORT, result -> {
-                    if (result.succeeded()) {
+
+                    if (result.succeeded())
+                    {
                         logger.info("Server started on port {}", Constants.SERVER_PORT);
-                    } else {
+                    }
+                    else
+                    {
                         logger.error("Failed to start server: {}", result.cause().getMessage());
                     }
                 });
-
-
     }
 
     public static void main(String[] args)
