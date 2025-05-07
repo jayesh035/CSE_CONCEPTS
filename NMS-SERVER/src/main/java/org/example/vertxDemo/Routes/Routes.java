@@ -43,6 +43,7 @@ public class Routes
 
         router.get("/discoveries").handler(jwtAuthHandler).handler(discoveryHandler::handleList);
         router.get("/discoveries/:id").handler(jwtAuthHandler).handler(discoveryHandler::handleRead);
+        router.put("/discoveries/:id").handler(jwtAuthHandler).handler(discoveryHandler::handleUpdate);
         router.delete("/discoveries/:id").handler(jwtAuthHandler).handler(discoveryHandler::handleDelete);
 
         // Route to run a discovery task manually
@@ -53,8 +54,26 @@ public class Routes
                                                ProvisioningHandler provisioningHandler,
                                                JWTAuthHandler jwtAuthHandler)
     {
-        router.post("/provision").handler(jwtAuthHandler).handler(provisioningHandler::handleProvision);
-        router.get("/provision/:deviceId").handler(jwtAuthHandler).handler(provisioningHandler::handleGetProvisionStatus);
+        router.post("/provision").
+                handler(jwtAuthHandler).
+                handler(provisioningHandler::handleProvision);
+
+
+        router.get("/provision/:id/start").
+                handler(jwtAuthHandler).
+                handler(provisioningHandler::handleStartPolling);
+
+        router.get("/provision/:id").
+                handler(jwtAuthHandler).
+                handler(provisioningHandler::handleGetProvisionById);
+
+        router.get("/provision/").
+                handler(jwtAuthHandler).
+                handler(provisioningHandler::handleListAllProvisions);
+
+        router.put("/provision/:id").
+                handler(jwtAuthHandler).
+                handler(provisioningHandler::handleUpdateProvision);
     }
 
 

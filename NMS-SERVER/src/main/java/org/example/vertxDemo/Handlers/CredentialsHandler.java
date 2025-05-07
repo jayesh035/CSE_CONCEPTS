@@ -14,11 +14,9 @@ public class CredentialsHandler
 {
     private static final Logger logger = LoggerFactory.getLogger(CredentialsHandler.class);
 
-    private final JWTAuth jwtAuth;
-
     public CredentialsHandler(JWTAuth jwtAuth)
     {
-        this.jwtAuth = jwtAuth;
+
     }
 
     // Create a new credential

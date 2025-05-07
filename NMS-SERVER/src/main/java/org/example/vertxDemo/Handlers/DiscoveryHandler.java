@@ -22,17 +22,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.example.vertxDemo.Utils.CallPlugin.callGoSnmpPlugin;
+
 
 public class DiscoveryHandler
 {
 
-    private final JWTAuth jwtAuth;
     private final Vertx vertx;
     private static final Logger logger = LoggerFactory.getLogger(DiscoveryHandler.class);
 
     public DiscoveryHandler(JWTAuth jwtAuth,Vertx vertx)
     {
-        this.jwtAuth = jwtAuth;
         this.vertx=vertx;
     }
 
@@ -231,13 +231,118 @@ public class DiscoveryHandler
     }
 
 
-    public void handleDelete(RoutingContext context)
-    {
-        String id = context.pathParam("id");
+    public void handleDelete(RoutingContext context) {
+        String idParam = context.pathParam("id");
 
-        // TODO: Delete from discovary and discovary_credentials
-        context.response().end("Deleted discovery " + id);
+        if (idParam == null) {
+            context.response().setStatusCode(400)
+                    .end(new JsonObject().put("error", "Missing discovery ID").encode());
+            return;
+        }
+
+        long discoveryId;
+        try {
+            discoveryId = Long.parseLong(idParam);
+        } catch (NumberFormatException e) {
+            context.response().setStatusCode(400)
+                    .end(new JsonObject().put("error", "Invalid discovery ID format").encode());
+            return;
+        }
+
+        String deleteQuery = "DELETE FROM discovery WHERE id = $1";
+
+        DatabaseClient.getPool().preparedQuery(deleteQuery).execute(Tuple.of(discoveryId), ar -> {
+            if (ar.succeeded()) {
+                if (ar.result().rowCount() == 0) {
+                    context.response().setStatusCode(404)
+                            .end(new JsonObject().put("error", "Discovery ID not found").encode());
+                } else {
+                    context.response()
+                            .putHeader("Content-Type", "application/json")
+                            .end(new JsonObject().put("message", "Discovery deleted successfully").encode());
+                }
+            } else {
+                context.response().setStatusCode(500)
+                        .putHeader("Content-Type", "application/json")
+                        .end(new JsonObject()
+                                .put("error", "Database error")
+                                .put("details", ar.cause().getMessage())
+                                .encode());
+            }
+        });
     }
+
+
+
+    public void handleUpdate(RoutingContext context)
+    {
+        String idParam = context.pathParam("id");
+
+        if (idParam == null)
+        {
+            context.response().setStatusCode(400)
+                    .end(new JsonObject().put("error", "Missing discovery ID").encode());
+            return;
+        }
+
+        long discoveryId;
+        try
+        {
+            discoveryId = Long.parseLong(idParam);
+        }
+        catch (NumberFormatException e)
+        {
+            context.response().setStatusCode(400)
+                    .end(new JsonObject().put("error", "Invalid discovery ID format").encode());
+            return;
+        }
+
+        JsonObject body = context.body().asJsonObject();
+
+        if (body == null || !body.containsKey("ip_address") || !body.containsKey("port"))
+        {
+            context.response().setStatusCode(400)
+                    .end(new JsonObject().put("error", "Missing ip_address or port in body").encode());
+            return;
+        }
+
+        String ipAddress = body.getString("ip_address");
+        int port = body.getInteger("port");
+        String discoveryName = body.getString("discovery_name", null); // optional
+
+        String updateQuery = "UPDATE discovary SET ip_address = $1, port = $2, discovery_name = $3 WHERE id = $4";
+
+        DatabaseClient.
+                getPool().
+                preparedQuery(updateQuery).
+                execute(Tuple.of(ipAddress, port, discoveryName, discoveryId), ar ->
+                {
+                    if (ar.succeeded())
+                    {
+                        if (ar.result().rowCount() == 0)
+                        {
+                            context.response().setStatusCode(404)
+                                    .end(new JsonObject().put("error", "Discovery ID not found").encode());
+                        }
+                        else
+                        {
+                            context.response().setStatusCode(200)
+                                    .end(new JsonObject().put("message", "Discovery updated successfully").encode());
+                        }
+                    }
+                    else
+                    {
+                        context.response().setStatusCode(500)
+                                .putHeader("Content-Type", "application/json")
+                                .end(new JsonObject()
+                                        .put("error", "Database error")
+                                        .put("details", ar.cause().getMessage())
+                                        .encode());
+                    }
+                }
+        );
+    }
+
 
     public void handleRunDiscovery(RoutingContext context)
     {
@@ -309,7 +414,8 @@ public class DiscoveryHandler
                             }
                             else
                             {
-                                ar1.cause().printStackTrace();
+//                                ar1.cause().toString();
+                                logger.error(ar1.cause().getMessage());
                                 ipPromise.complete(new JsonObject().put("ip", ip).put("error", "Processing failed"));
                             }
                         });
@@ -411,12 +517,11 @@ public class DiscoveryHandler
                                             else
                                             {
                                                 // Network error case — insert with `status = false`, and describe the error in `response`
-                                                StringBuilder response = new StringBuilder();
-                                                response.append("Network error: ");
-                                                response.append("IP reachable = ").append(isIpReachable).append(", ");
-                                                response.append("Port open = ").append(isPortOpen);
+                                                String response = "Network error: " +
+                                                        "IP reachable = " + isIpReachable + ", " +
+                                                        "Port open = " + isPortOpen;
 
-                                                insertDiscoveryResult(discoveryId, ip, port, null, false, response.toString());
+                                                insertDiscoveryResult(discoveryId, ip, port, null, false, response);
                                             }
                                         }
 
@@ -467,42 +572,7 @@ public class DiscoveryHandler
         });
     }
 
-    private JsonObject callGoSnmpPlugin(JsonObject input) throws Exception
-    {
-        // Create a temporary file for input
-        Path inputPath = Files.createTempFile("snmp_input_", ".json");
-        Files.write(inputPath, input.encode().getBytes());
 
-        // Create a temporary file for output
-        Path outputPath = Files.createTempFile("snmp_output_", ".json");
-
-        // Execute the Go plugin as a process
-        ProcessBuilder processBuilder = new ProcessBuilder(
-                "/home/jayesh/Desktop/motadata/NMS-SERVER/src/main/java/Plugin/go_discovery_plugin",  // Path to your compiled Go binary
-                inputPath.toString(),       // Input file path
-                outputPath.toString()       // Output file path
-        );
-
-        Process process = processBuilder.start();
-        int exitCode = process.waitFor();
-
-        if (exitCode != 0)
-        {
-            // Read error output if available
-            String errorOutput = new String(process.getErrorStream().readAllBytes());
-            throw new Exception("Go plugin execution failed with exit code " +
-                    exitCode + ": " + errorOutput);
-        }
-
-        // Read the output file
-        String result = new String(Files.readAllBytes(outputPath));
-
-        // Clean up temporary files
-        Files.deleteIfExists(inputPath);
-        Files.deleteIfExists(outputPath);
-
-        return new JsonObject(result);
-    }
 
 
     private Future<List<JsonObject>> fetchCredentials(long discoveryId)

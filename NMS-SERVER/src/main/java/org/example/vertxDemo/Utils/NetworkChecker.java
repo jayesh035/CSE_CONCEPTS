@@ -1,10 +1,13 @@
 package org.example.vertxDemo.Utils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 public class NetworkChecker extends AbstractVerticle
 {
+    private static final Logger logger = LoggerFactory.getLogger(NetworkChecker.class);
     @Override
     public void start()
     {
@@ -52,7 +55,8 @@ public class NetworkChecker extends AbstractVerticle
         }
         catch (IOException | InterruptedException e)
         {
-            e.printStackTrace();
+
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -71,7 +75,7 @@ public class NetworkChecker extends AbstractVerticle
         }
         catch (IOException | InterruptedException e)
         {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -90,3 +94,5 @@ public class NetworkChecker extends AbstractVerticle
     }
 }
 
+
+//

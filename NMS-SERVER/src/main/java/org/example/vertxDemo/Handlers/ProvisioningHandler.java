@@ -1,25 +1,27 @@
 package org.example.vertxDemo.Handlers;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.core.json.JsonObject;
+import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 import org.example.vertxDemo.Database.DatabaseClient;
+import org.example.vertxDemo.Polling.PollingEngine;
 
 public class ProvisioningHandler
 {
-    private final JWTAuth jwtAuth;
-    private final Vertx vertx;
+    public  final  Vertx vertx;
 
     public ProvisioningHandler(JWTAuth jwtAuth, Vertx vertx)
     {
-        this.jwtAuth = jwtAuth;
-        this.vertx = vertx;
+        this.vertx=vertx;
     }
+
 
     public void handleProvision(RoutingContext context)
     {
-        JsonObject body = context.getBodyAsJson();
+        JsonObject body = context.body().asJsonObject();
 
         // Check if required fields are present
         if (body == null || !body.containsKey("ip_address") || !body.containsKey("discovary_id"))
@@ -56,9 +58,9 @@ public class ProvisioningHandler
                 // Fetch SNMP metrics (directly associated with credential_id or some other logic to define metrics)
                 JsonObject metrics = new JsonObject();
                 // Example: Adding some metrics directly
-                metrics.put("sysName", 60);        // sysName with a polling interval of 60 seconds
-                metrics.put("sysLocation", 120);   // sysLocation with a polling interval of 120 seconds
-                metrics.put("sysDescr", 90);       // sysDescr with a polling interval of 90 seconds
+                metrics.put("sysName", 3);        // sysName with a polling interval of 60 seconds
+                metrics.put("sysLocation", 4);   // sysLocation with a polling interval of 120 seconds
+                metrics.put("sysDescr", 5);       // sysDescr with a polling interval of 90 seconds
 
                 // Check if the provision record already exists for this ip_address and discovary_id
                 String checkProvisionQuery = "SELECT * FROM provision WHERE ip_address = $1 AND discovary_id = $2";
@@ -147,6 +149,154 @@ public class ProvisioningHandler
     }
 
 
+    public void handleUpdateProvision(RoutingContext context)
+    {
+        JsonObject body = context.body().asJsonObject();
+        if (!body.containsKey("provision_id") || !body.containsKey("credential_id") || !body.containsKey("metrics")) {
+            context.response().setStatusCode(400)
+                    .end(new JsonObject().put("error", "Missing fields").encode());
+            return;
+        }
+
+        long provisionId = body.getLong("provision_id");
+        int credentialId = body.getInteger("credential_id");
+        JsonObject metrics = body.getJsonObject("metrics");
+
+        String query = "UPDATE provision SET credential_id = $1, metrics = $2::jsonb WHERE provision_id = $3";
+
+        DatabaseClient.getPool().preparedQuery(query)
+                .execute(Tuple.of(credentialId, metrics.encode(), provisionId), ar -> {
+                    if (ar.succeeded()) {
+                        context.response()
+                                .putHeader("Content-Type", "application/json")
+                                .end(new JsonObject().put("message", "Provision updated").encode());
+                    }
+                    else
+                    {
+                        context.response().setStatusCode(500)
+                                .end(new JsonObject().put("error", "Failed to update provision").encode());
+                    }
+                });
+    }
+
+
+    public void handleStartPolling(RoutingContext context)
+    {
+        String provisionIdStr = context.pathParam("id");
+
+        try
+        {
+            long provisionId = Long.parseLong(provisionIdStr);
+
+            String query = "SELECT * FROM provision WHERE provision_id = $1";
+
+            DatabaseClient.getPool()
+                    .preparedQuery(query)
+                    .execute(Tuple.of(provisionId), ar -> {
+
+                        if (ar.succeeded() && ar.result().rowCount() > 0)
+                        {
+                            Row row = ar.result().iterator().next();
+                            String ip = row.getString("ip_address");
+                            String metricsStr = row.getString("metrics");
+                            String credentialsId= row.getString("credential_id");
+                            String discoveryId= row.getString("discovary_id");
+
+                            if (metricsStr != null)
+                            {
+//                                JsonObject provisionResponse()
+                                JsonObject metrics = new JsonObject(metricsStr);  // ✅ fixed: parse directly
+                                PollingEngine.startPolling(this.vertx , provisionId, ip, metrics);
+                                context.response().setStatusCode(200)
+                                        .end(new JsonObject().put("success", "Polling is started...").encode());
+                            }
+                            else
+                            {
+                                context.response().setStatusCode(400)
+                                        .end(new JsonObject().put("error", "Metrics JSON is null").encode());
+                            }
+                        }
+                        else
+                        {
+                            context.response().setStatusCode(404)
+                                    .end("Provisioning ID not found");
+                        }
+                    });
+
+        }
+        catch (NumberFormatException e)
+        {
+            context.response().setStatusCode(400).end("Invalid provision ID format");
+        }
+    }
+
+    public void handleListAllProvisions(RoutingContext context)
+    {
+        String query = "SELECT * FROM provision";
+
+        DatabaseClient.
+                getPool().
+                query(query).
+                execute(ar -> {
+
+            if (ar.succeeded())
+            {
+                JsonArray results = new JsonArray();
+
+                for (Row row : ar.result())
+                {
+                    JsonObject obj = new JsonObject()
+                            .put("provision_id", row.getLong("provision_id"))
+                            .put("discovary_id", row.getLong("discovary_id"))
+                            .put("ip_address", row.getString("ip_address"))
+                            .put("credential_id", row.getInteger("credential_id"));
+
+                    String metricsStr = row.getString("metrics");
+
+                    if (metricsStr != null)
+                    {
+                        obj.put("metrics", new JsonObject(metricsStr));
+                    }
+                    else
+                    {
+                        obj.put("metrics", new JsonObject());
+                    }
+
+                    results.add(obj);
+                }
+                context.response().putHeader("Content-Type", "application/json").end(results.encode());
+            } else {
+                context.response().setStatusCode(500).end(new JsonObject().put("error", "Failed to fetch provisions").encode());
+            }
+        });
+    }
+
+    public void handleGetProvisionById(RoutingContext context) {
+        String idStr = context.pathParam("id");
+
+        try {
+            long provisionId = Long.parseLong(idStr);
+            String query = "SELECT * FROM provision WHERE provision_id = $1";
+
+            DatabaseClient.getPool().preparedQuery(query).execute(Tuple.of(provisionId), ar -> {
+                if (ar.succeeded() && ar.result().rowCount() > 0) {
+                    Row row = ar.result().iterator().next();
+                    JsonObject obj = new JsonObject()
+                            .put("provision_id", row.getLong("provision_id"))
+                            .put("discovary_id", row.getLong("discovary_id"))
+                            .put("ip_address", row.getString("ip_address"))
+                            .put("credential_id", row.getInteger("credential_id"))
+                            .put("metrics", new JsonObject(row.getString("metrics")));
+
+                    context.response().putHeader("Content-Type", "application/json").end(obj.encode());
+                } else {
+                    context.response().setStatusCode(404).end(new JsonObject().put("error", "Provision not found").encode());
+                }
+            });
+        } catch (NumberFormatException e) {
+            context.response().setStatusCode(400).end(new JsonObject().put("error", "Invalid ID format").encode());
+        }
+    }
 
 
 
